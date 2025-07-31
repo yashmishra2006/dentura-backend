@@ -1,5 +1,9 @@
+gunicorn
+gdown
+ultralytics
 flask
 flask-cors
-ultralytics  # for YOLOv8
 torch
-opencv-python
+torchvision
+pillow
+requests

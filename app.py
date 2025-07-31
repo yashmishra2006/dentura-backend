@@ -11,7 +11,7 @@ import torchvision.transforms as transforms
 from PIL import Image, ImageDraw, ImageFont
 from io import BytesIO
 import traceback
-import urllib.request
+import gdown
 
 GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")  # Ensure you've set your API key in your environment variables.
 
@@ -26,15 +26,12 @@ CORS(app)
 YOLO_MODELS = {}
 YOLO_MODEL_PATH = "yolov8.pt"
 RESNET_MODEL_PATH = "resnet_gums.pth"
-YOLO_MODEL_URL = "https://drive.google.com/file/d/1_AaiymL13F-fxaElD_tQRiImfJ4iLGz_/view?usp=sharing"
-RESNET_MODEL_URL = "https://drive.google.com/file/d/1XemIV3DEG7ZFvlH-u-a56fZ3h2a_Xrsa/view?usp=sharing"
-
 # Initialize YOLO model with error handling
 try:
     if not os.path.exists(YOLO_MODEL_PATH):
-        print("⬇️ Downloading model...")
-        urllib.request.urlretrieve(YOLO_MODEL_URL, YOLO_MODEL_PATH)
-        YOLO_MODELS["xray"] = YOLO("models/xray-yolo.pt")
+        print("⬇️ Downloading YOLO model...")
+        gdown.download(id="1_AaiymL13F-fxaElD_tQRiImfJ4iLGz_", output=YOLO_MODEL_PATH, quiet=False)
+        YOLO_MODELS["xray"] = YOLO(YOLO_MODEL_PATH)
         print("✅ YOLO X-ray model loaded successfully.")
     else:
         print("❌ YOLO model file not found. Please ensure 'models/xray-yolo.pt' exists.")
@@ -50,10 +47,10 @@ resnet_model = None
 try:
     if not os.path.exists("resnet_gums.pth"):
         print("⬇️ Downloading model...")
-        urllib.request.urlretrieve(RESNET_MODEL_URL, RESNET_MODEL_PATH)
+        gdown.download(id="1XemIV3DEG7ZFvlH-u-a56fZ3h2a_Xrsa", output=RESNET_MODEL_PATH, quiet=False)
         resnet_model = models.resnet50(pretrained=True)
         resnet_model.fc = torch.nn.Linear(resnet_model.fc.in_features, NUM_CLASSES)
-        resnet_model.load_state_dict(torch.load("models/resnet_gums.pth", map_location="cpu"))
+        resnet_model.load_state_dict(torch.load(RESNET_MODEL_PATH, map_location="cpu"))
         resnet_model.eval()
         print("✅ ResNet gums model loaded successfully.")
     else:
@@ -612,4 +609,5 @@ if __name__ == "__main__":
         os.makedirs('./temp_images')
         print("📁 Created temp_images directory")
     
-    app.run(debug=True, host='127.0.0.1', port=5000)
+    port = int(os.environ.get('PORT', 5000))
+    app.run(host="0.0.0.0", port=port)
