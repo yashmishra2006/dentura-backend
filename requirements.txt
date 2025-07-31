@@ -1,0 +1,5 @@
+flask
+flask-cors
+ultralytics  # for YOLOv8
+torch
+opencv-python
