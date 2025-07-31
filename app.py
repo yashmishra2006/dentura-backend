@@ -22,6 +22,8 @@ GEMINI_API_URL = "https://gemini.googleapis.com/v1/detectIntent"
 app = Flask(__name__)
 CORS(app)
 
+#check if the environment variable is set
+
 # === Load YOLOv8 X-ray Model ===
 YOLO_MODELS = {}
 YOLO_MODEL_PATH = "yolov8.pt"
