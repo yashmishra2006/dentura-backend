@@ -20,7 +20,7 @@ GEMINI_API_URL = "https://gemini.googleapis.com/v1/detectIntent"
 
 # === Initialize Flask App ===
 app = Flask(__name__)
-CORS(app)
+CORS(app, origins=["http://localhost:5173"])
 
 # === Load YOLOv8 X-ray Model ===
 YOLO_MODELS = {}
