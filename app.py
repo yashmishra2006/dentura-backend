@@ -11,6 +11,7 @@ import torchvision.transforms as transforms
 from PIL import Image, ImageDraw, ImageFont
 from io import BytesIO
 import traceback
+import urllib.request
 
 GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")  # Ensure you've set your API key in your environment variables.
 
@@ -23,10 +24,16 @@ CORS(app)
 
 # === Load YOLOv8 X-ray Model ===
 YOLO_MODELS = {}
+YOLO_MODEL_PATH = "yolov8.pt"
+RESNET_MODEL_PATH = "resnet_gums.pth"
+YOLO_MODEL_URL = "https://drive.google.com/file/d/1_AaiymL13F-fxaElD_tQRiImfJ4iLGz_/view?usp=sharing"
+RESNET_MODEL_URL = "https://drive.google.com/file/d/1XemIV3DEG7ZFvlH-u-a56fZ3h2a_Xrsa/view?usp=sharing"
 
 # Initialize YOLO model with error handling
 try:
-    if os.path.exists("models/xray-yolo.pt"):
+    if not os.path.exists(YOLO_MODEL_PATH):
+        print("⬇️ Downloading model...")
+        urllib.request.urlretrieve(YOLO_MODEL_URL, YOLO_MODEL_PATH)
         YOLO_MODELS["xray"] = YOLO("models/xray-yolo.pt")
         print("✅ YOLO X-ray model loaded successfully.")
     else:
@@ -41,7 +48,9 @@ CLASSES = ["Calculus", "Caries", "Gingivitis", "Mouth Ulcer", "Tooth Discolorati
 # Load the ResNet model
 resnet_model = None
 try:
-    if os.path.exists("models/resnet_gums.pth"):
+    if not os.path.exists("resnet_gums.pth"):
+        print("⬇️ Downloading model...")
+        urllib.request.urlretrieve(RESNET_MODEL_URL, RESNET_MODEL_PATH)
         resnet_model = models.resnet50(pretrained=True)
         resnet_model.fc = torch.nn.Linear(resnet_model.fc.in_features, NUM_CLASSES)
         resnet_model.load_state_dict(torch.load("models/resnet_gums.pth", map_location="cpu"))
